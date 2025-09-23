@@ -1,0 +1,82 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getActrices, getActrizBySlug } from '../../lib/wp';
+
+export async function getStaticPaths() {
+    const actrices = await getActrices();
+    return actrices.map(actriz => ({
+        params: { slug: actriz.slug },
+    }));
+}
+
+const { slug } = Astro.params;
+const actriz = await getActrizBySlug(slug);
+---
+
+<Layout 
+    title={`${actriz.name} | Actrices`} 
+    description={actriz.bio.substring(0, 155) + '...'} 
+    keywords={`${actriz.name}, actriz, cine, televisión`}
+>
+    <main class="max-w-4xl mx-auto px-4 py-12">
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <!-- Imagen Hero -->
+            <div class="relative h-96">
+                <img 
+                    src={actriz.image} 
+                    alt={actriz.name}
+                    class="w-full h-full object-cover"
+                />
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                <h1 class="absolute bottom-6 left-6 text-4xl font-bold text-white">
+                    {actriz.name}
+                </h1>
+            </div>
+
+            <!-- Contenido -->
+            <div class="p-8">
+                <!-- Información Personal -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <div>
+                        <h2 class="text-2xl font-semibold mb-4">Información Personal</h2>
+                        <ul class="space-y-3">
+                            <li>
+                                <span class="font-medium text-gray-600">Fecha de nacimiento:</span>
+                                <span class="ml-2">{actriz.birthDate}</span>
+                            </li>
+                            <li>
+                                <span class="font-medium text-gray-600">Lugar de nacimiento:</span>
+                                <span class="ml-2">{actriz.birthPlace}</span>
+                            </li>
+                            <li>
+                                <span class="font-medium text-gray-600">Altura:</span>
+                                <span class="ml-2">{actriz.height}</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Botón de regreso -->
+                    <div class="flex items-start justify-end">
+                        <a 
+                            href="/actrices" 
+                            class="inline-flex items-center px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                            </svg>
+                            Volver a actrices
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Biografía -->
+                <div>
+                    <h2 class="text-2xl font-semibold mb-4">Biografía</h2>
+                    <p class="text-gray-700 leading-relaxed">
+                        {actriz.bio}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+</Layout>

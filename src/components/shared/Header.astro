@@ -1,0 +1,75 @@
+---
+const currentPath = Astro.url.pathname;
+
+const navItems = [
+    { name: 'Inicio', path: '/' },
+    { name: 'Actrices', path: '/actrices' },
+];
+---
+
+<header class="bg-white shadow-sm fixed w-full top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+            <!-- Logo -->
+            <a href="/" class="flex items-center space-x-3">
+                <span class="text-2xl font-bold text-purple-600">ActricesDB</span>
+            </a>
+
+            <!-- Navigation -->
+            <nav class="hidden md:flex space-x-8">
+                {navItems.map(item => (
+                    <a
+                        href={item.path}
+                        class={`text-base font-medium transition-colors hover:text-purple-600 ${
+                            currentPath === item.path
+                                ? 'text-purple-600 border-b-2 border-purple-600'
+                                : 'text-gray-700'
+                        }`}
+                    >
+                        {item.name}
+                    </a>
+                ))}
+            </nav>
+
+            <!-- Mobile menu button -->
+            <button 
+                type="button" 
+                class="md:hidden p-2 text-gray-700 hover:text-purple-600"
+                id="mobile-menu-button"
+                aria-label="Menú móvil"
+            >
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div class="md:hidden hidden" id="mobile-menu">
+        <div class="px-2 pt-2 pb-3 space-y-1 bg-white shadow-lg">
+            {navItems.map(item => (
+                <a
+                    href={item.path}
+                    class={`block px-3 py-2 text-base font-medium rounded-md transition-colors hover:bg-purple-50 hover:text-purple-600 ${
+                        currentPath === item.path
+                            ? 'text-purple-600 bg-purple-50'
+                            : 'text-gray-700'
+                    }`}
+                >
+                    {item.name}
+                </a>
+            ))}
+        </div>
+    </div>
+</header>
+
+<script>
+    // Mobile menu toggle
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    mobileMenuButton?.addEventListener('click', () => {
+        mobileMenu?.classList.toggle('hidden');
+    });
+</script>

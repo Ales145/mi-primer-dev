@@ -1,0 +1,49 @@
+---
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="bg-gray-900 text-white py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Logo y descripción -->
+            <div>
+                <h3 class="text-xl font-bold text-purple-400 mb-4">ActricesDB</h3>
+                <p class="text-gray-400">
+                    Tu fuente confiable de información sobre las actrices más destacadas del cine y la televisión.
+                </p>
+            </div>
+
+            <!-- Enlaces rápidos -->
+            <div>
+                <h4 class="text-lg font-semibold mb-4">Enlaces Rápidos</h4>
+                <ul class="space-y-2">
+                    <li>
+                        <a href="/" class="text-gray-400 hover:text-purple-400 transition-colors">Inicio</a>
+                    </li>
+                    <li>
+                        <a href="/actrices" class="text-gray-400 hover:text-purple-400 transition-colors">Actrices</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Información legal -->
+            <div>
+                <h4 class="text-lg font-semibold mb-4">Legal</h4>
+                <ul class="space-y-2">
+                    <li>
+                        <a href="#" class="text-gray-400 hover:text-purple-400 transition-colors">Política de Privacidad</a>
+                    </li>
+                    <li>
+                        <a href="#" class="text-gray-400 hover:text-purple-400 transition-colors">Términos de Uso</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+            <p class="text-gray-400">
+                &copy; {currentYear} ActricesDB. Todos los derechos reservados.
+            </p>
+        </div>
+    </div>
+</footer>
