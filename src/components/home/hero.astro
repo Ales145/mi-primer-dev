@@ -1,0 +1,66 @@
+---
+interface Actriz {
+  name: string;
+  slug: string;
+  image: string;
+  bio: string;
+}
+
+const { actricesDestacadas } = Astro.props;
+---
+
+<main>
+  <!-- Hero Section -->
+  <section class="bg-gradient-to-b from-purple-900 to-purple-700 text-white py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-4xl md:text-6xl font-bold mb-6">
+        Descubre el Talento del Cine
+      </h1>
+      <p class="text-xl md:text-2xl mb-8 text-purple-200">
+        Explora las historias y trayectorias de las actrices más destacadas
+      </p>
+      <a 
+        href="/actrices" 
+        class="inline-block bg-white text-purple-700 px-8 py-3 rounded-full font-semibold hover:bg-purple-100 transition-colors"
+      >
+        Ver todas las actrices
+      </a>
+    </div>
+  </section>
+
+  <!-- Featured Actresses Section -->
+  <section class="py-16 px-4 bg-gray-50">
+    <div class="max-w-7xl mx-auto">
+      <h2 class="text-3xl font-bold text-center mb-12">Actrices Destacadas</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {actricesDestacadas.slice(0, 3).map((actriz: Actriz) => (
+          <article class="bg-white rounded-xl shadow-md overflow-hidden transform hover:scale-105 transition-transform duration-300">
+            <img 
+              src={actriz.image} 
+              alt={actriz.name}
+              class="w-full h-72 object-cover"
+            />
+            <div class="p-6">
+              <h3 class="text-xl font-bold mb-2">{actriz.name}</h3>
+              <p class="text-gray-600 line-clamp-3 mb-4">{actriz.bio}</p>
+              <a 
+                href={`/actrices/${actriz.slug}`}
+                class="text-purple-600 font-semibold hover:text-purple-800"
+              >
+                Leer más →
+              </a>
+            </div>
+          </article>
+        ))}
+      </div>
+      <div class="text-center mt-12">
+        <a 
+          href="/actrices" 
+          class="inline-block bg-purple-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-purple-700 transition-colors"
+        >
+          Ver todas las actrices
+        </a>
+      </div>
+    </div>
+  </section>
+</main>

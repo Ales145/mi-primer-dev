@@ -1,0 +1,11 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Actrices from "../components/actrices/hero.astro";
+import { getActrices } from "../lib/wp";
+
+const actrices = await getActrices();
+---
+
+<Layout title="Actrices" description="Actrices" keywords="actrices">
+    <Actrices actrices={actrices} />
+</Layout>
