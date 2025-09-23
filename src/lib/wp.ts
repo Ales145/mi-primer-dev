@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost/api-actriz.php';
+const API_URL = 'https://ensalud.info/generator/api-actriz.php';
 
 interface Actriz {
   id: string;
