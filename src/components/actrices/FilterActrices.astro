@@ -1,37 +1,31 @@
 ---
-import type { FilterOptions } from '../../lib/wp';
-
 interface Props {
   class?: string;
-  currentFilters?: FilterOptions;
+  currentOrderBy?: string;
+  featured?: boolean;
 }
 
-const { class: className, currentFilters = {} } = Astro.props;
+const { class: className, currentOrderBy = '', featured = false } = Astro.props;
 
-const sortOptions = [
+const orderOptions = [
   { value: 'name-asc', label: 'Nombre (A-Z)' },
   { value: 'name-desc', label: 'Nombre (Z-A)' },
-  { value: 'birthDate-asc', label: 'Edad (Menor a Mayor)' },
-  { value: 'birthDate-desc', label: 'Edad (Mayor a Menor)' }
+  { value: 'date-asc', label: 'Edad (Menor a Mayor)' },
+  { value: 'date-desc', label: 'Edad (Mayor a Menor)' }
 ];
 ---
 
 <div class:list={['filters-container', className]}>
   <div class="filter-group">
-    <label for="sort">Ordenar por:</label>
-    <select id="sort" class="filter-select">
+    <label for="orderBy">Ordenar por:</label>
+    <select id="orderBy" name="orderBy" class="filter-select">
       <option value="">Seleccionar...</option>
       {
-        sortOptions.map(({ value, label }) => {
-          const [sortBy, sortOrder] = value.split('-');
-          const isSelected = currentFilters.sortBy === sortBy && 
-                           currentFilters.sortOrder === sortOrder;
-          return (
-            <option value={value} selected={isSelected}>
-              {label}
-            </option>
-          );
-        })
+        orderOptions.map(({ value, label }) => (
+          <option value={value} selected={currentOrderBy === value}>
+            {label}
+          </option>
+        ))
       }
     </select>
   </div>
@@ -40,8 +34,9 @@ const sortOptions = [
     <label class="checkbox-label">
       <input
         type="checkbox"
+        name="featured"
         id="featured"
-        checked={currentFilters.featured}
+        checked={featured}
       />
       Solo destacadas
     </label>
@@ -49,38 +44,35 @@ const sortOptions = [
 </div>
 
 <script>
-  function updateURL(filters: Record<string, string | boolean>) {
+  const orderSelect = document.getElementById('orderBy') as HTMLSelectElement;
+  const featuredCheckbox = document.getElementById('featured') as HTMLInputElement;
+
+  function updateFilters() {
     const url = new URL(window.location.href);
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value) {
-        url.searchParams.set(key, value.toString());
-      } else {
-        url.searchParams.delete(key);
-      }
-    });
+    
+    if (orderSelect.value) {
+      url.searchParams.set('orderBy', orderSelect.value);
+    } else {
+      url.searchParams.delete('orderBy');
+    }
+    
+    if (featuredCheckbox.checked) {
+      url.searchParams.set('featured', 'true');
+    } else {
+      url.searchParams.delete('featured');
+    }
+
+    // Mantener el parámetro de página si existe
+    const page = url.searchParams.get('page');
+    if (page && page !== '1') {
+      url.searchParams.set('page', '1'); // Reset a primera página al filtrar
+    }
+
     window.location.href = url.toString();
   }
 
-  // Sort handler
-  const sortSelect = document.getElementById('sort') as HTMLSelectElement;
-  sortSelect?.addEventListener('change', () => {
-    const [sortBy, sortOrder] = (sortSelect.value || '-').split('-');
-    updateURL({
-      sortBy,
-      sortOrder,
-      featured: (document.getElementById('featured') as HTMLInputElement)?.checked || false
-    });
-  });
-
-  // Featured filter handler
-  const featuredCheckbox = document.getElementById('featured') as HTMLInputElement;
-  featuredCheckbox?.addEventListener('change', () => {
-    updateURL({
-      sortBy: (sortSelect.value || '-').split('-')[0],
-      sortOrder: (sortSelect.value || '-').split('-')[1],
-      featured: featuredCheckbox.checked
-    });
-  });
+  orderSelect?.addEventListener('change', updateFilters);
+  featuredCheckbox?.addEventListener('change', updateFilters);
 </script>
 
 <style>

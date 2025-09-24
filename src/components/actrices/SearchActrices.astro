@@ -1,6 +1,4 @@
 ---
-import { searchActrices } from '../../lib/wp';
-
 interface Props {
   class?: string;
 }
@@ -9,48 +7,56 @@ const { class: className } = Astro.props;
 ---
 
 <div class:list={['search-container', className]}>
-  <input
-    type="search"
-    id="search-actrices"
-    placeholder="Buscar actrices..."
-    class="search-input"
-  />
-  <div id="search-results" class="search-results"></div>
+  <form id="search-form" class="relative">
+    <input
+      type="search"
+      name="q"
+      id="search-actrices"
+      placeholder="Buscar actrices..."
+      class="search-input"
+      autocomplete="off"
+    />
+    <div id="search-results" class="search-results"></div>
+  </form>
 </div>
 
 <script>
-  let debounceTimer: ReturnType<typeof setTimeout>;
+  const API_URL = 'https://ensalud.info/generator/api-actriz.php';
+  const form = document.getElementById('search-form') as HTMLFormElement;
   const searchInput = document.getElementById('search-actrices') as HTMLInputElement;
   const searchResults = document.getElementById('search-results');
+  let debounceTimer: ReturnType<typeof setTimeout>;
+
+  async function searchActrices(query: string) {
+    try {
+      const response = await fetch(`${API_URL}?action=search&q=${encodeURIComponent(query)}`);
+      if (!response.ok) throw new Error('Error en la búsqueda');
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
+  }
 
   searchInput?.addEventListener('input', (e) => {
     const query = (e.target as HTMLInputElement).value;
     
-    // Clear previous timer
     clearTimeout(debounceTimer);
     
-    // Clear results if query is empty
     if (!query.trim()) {
       if (searchResults) searchResults.innerHTML = '';
       return;
     }
 
-    // Debounce the search
     debounceTimer = setTimeout(async () => {
       try {
-        const response = await fetch(`${window.location.origin}/api/search?query=${encodeURIComponent(query)}`);
-        const data = await response.json();
-        
-        if (!data.success) {
-          throw new Error(data.error || 'Error en la búsqueda');
-        }
-        
-        const actrices = data.data;
+        const result = await searchActrices(query);
         
         if (!searchResults) return;
         
-        if (actrices && actrices.length > 0) {
-          searchResults.innerHTML = actrices
+        if (result.success && result.data.length > 0) {
+          searchResults.innerHTML = result.data
             .map((actriz: any) => `
               <a href="/actrices/${actriz.slug}" class="search-result-item">
                 <img src="${actriz.image}" alt="${actriz.name}" class="search-result-image">
@@ -68,19 +74,119 @@ const { class: className } = Astro.props;
         if (searchResults) {
           searchResults.innerHTML = '<p class="error">Error al buscar. Intente nuevamente.</p>';
         }
-        console.error('Error searching:', error);
+        console.error('Error en la búsqueda:', error);
       }
-    }, 300); // Debounce 300ms
+    }, 300);
   });
 
-  // Close results when clicking outside
+  // Cerrar resultados al hacer clic fuera
   document.addEventListener('click', (e) => {
     if (searchResults && !searchResults.contains(e.target as Node) && 
         searchInput && !searchInput.contains(e.target as Node)) {
       searchResults.innerHTML = '';
     }
   });
+
+  // Prevenir envío del formulario
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const query = searchInput?.value.trim();
+    if (query) {
+      window.location.href = `/actrices?q=${encodeURIComponent(query)}`;
+    }
+  });
 </script>
+
+<style>
+  .search-container {
+    position: relative;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 12px 20px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: #4a90e2;
+  }
+
+  .search-results {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 1000;
+  }
+
+  .search-input:focus + .search-results,
+  .search-results:hover {
+    display: block;
+  }
+
+  .search-result-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    text-decoration: none;
+    color: inherit;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s;
+  }
+
+  .search-result-item:last-child {
+    border-bottom: none;
+  }
+
+  .search-result-item:hover {
+    background-color: #f5f5f5;
+  }
+
+  .search-result-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 4px;
+    object-fit: cover;
+    margin-right: 12px;
+  }
+
+  .search-result-info h3 {
+    margin: 0;
+    font-size: 16px;
+    color: #333;
+  }
+
+  .search-result-info p {
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: #666;
+  }
+
+  .no-results,
+  .error {
+    padding: 12px;
+    text-align: center;
+    color: #666;
+  }
+
+  .error {
+    color: #e74c3c;
+  }
+</style>
 
 <style>
   .search-container {

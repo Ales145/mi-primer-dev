@@ -62,45 +62,45 @@ export const getActrizBySlug = async (slug: string): Promise<Actriz> => {
 /** Buscar actrices */
 export const searchActrices = async (query: string): Promise<Actriz[]> => {
   const endpoint = `${API_URL}?action=search&q=${encodeURIComponent(query)}`;
-  const response = await fetch(endpoint);
-  if (!response.ok) throw new Error(`Error ${response.status} al buscar actrices.`);
-  const data: ApiResponse<Actriz[]> = await response.json();
-  if (!data.success) throw new Error(data.error || 'Error desconocido al buscar actrices');
-  return data.data;
+  try {
+    const response = await fetch(endpoint);
+    if (!response.ok) throw new Error(`Error ${response.status}`);
+    const data = await response.json();
+    if (!data.success) throw new Error(data.error || 'Error desconocido');
+    return data.data;
+  } catch (error) {
+    console.error('Error en búsqueda:', error);
+    return [];
+  }
 };
 
 /** Obtener actrices con filtros */
 export interface FilterOptions {
-  sortBy?: 'name' | 'birthDate';
-  sortOrder?: 'asc' | 'desc';
+  orderBy?: string;
   featured?: boolean;
 }
 
-export const getActricesFiltered = async (filters: FilterOptions): Promise<Actriz[]> => {
-  // Get all actresses first
-  let actrices = await getActrices();
+export const getActricesFiltered = async (filters: FilterOptions = {}): Promise<Actriz[]> => {
+  const params = new URLSearchParams();
+  params.append('action', 'filter');
   
-  // Apply featured filter
+  if (filters.orderBy) {
+    params.append('orderBy', filters.orderBy);
+  }
+  
   if (filters.featured) {
-    actrices = actrices.filter(actriz => actriz.featured);
+    params.append('featured', 'true');
   }
 
-  // Apply sorting
-  if (filters.sortBy) {
-    actrices.sort((a, b) => {
-      const aValue = filters.sortBy === 'name' ? a.name : a.birthDate;
-      const bValue = filters.sortBy === 'name' ? b.name : b.birthDate;
-      
-      if (filters.sortBy === 'birthDate') {
-        const dateA = new Date(aValue).getTime();
-        const dateB = new Date(bValue).getTime();
-        return filters.sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
-      } else {
-        const compareResult = aValue.localeCompare(bValue);
-        return filters.sortOrder === 'asc' ? compareResult : -compareResult;
-      }
-    });
+  const endpoint = `${API_URL}?${params.toString()}`;
+  try {
+    const response = await fetch(endpoint);
+    if (!response.ok) throw new Error(`Error ${response.status}`);
+    const data = await response.json();
+    if (!data.success) throw new Error(data.error || 'Error desconocido');
+    return data.data;
+  } catch (error) {
+    console.error('Error en filtros:', error);
+    return await getActrices(); // Fallback a todas las actrices si hay error
   }
-
-  return actrices;
 };
