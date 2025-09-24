@@ -1,6 +1,6 @@
 const API_URL = 'https://ensalud.info/generator/api-actriz.php';
 
-interface Actriz {
+export interface Actriz {
   id: string;
   name: string;
   slug: string;
@@ -78,29 +78,73 @@ export const searchActrices = async (query: string): Promise<Actriz[]> => {
 export interface FilterOptions {
   orderBy?: string;
   featured?: boolean;
+  page?: number;
+  perPage?: number;
+  search?: string;
 }
 
-export const getActricesFiltered = async (filters: FilterOptions = {}): Promise<Actriz[]> => {
+export interface PaginatedResponse<T> {
+  data: T[];
+  totalItems: number;
+  currentPage: number;
+  totalPages: number;
+  itemsPerPage: number;
+}
+
+export const getActricesFiltered = async (filters: FilterOptions = {}): Promise<PaginatedResponse<Actriz>> => {
   const params = new URLSearchParams();
-  params.append('action', 'filter');
   
+  // Si hay búsqueda, usamos action search, si no, action all
+  if (filters.search) {
+    params.append('action', 'search');
+    params.append('q', filters.search);
+  } else {
+    params.append('action', 'all');
+  }
+  
+  // Parámetros de filtrado
   if (filters.orderBy) {
-    params.append('orderBy', filters.orderBy);
+    params.append('order', filters.orderBy);
   }
   
   if (filters.featured) {
     params.append('featured', 'true');
   }
+  
+  // Parámetros de paginación
+  const page = filters.page || 1;
+  const perPage = filters.perPage || 12;
+  params.append('page', page.toString());
+  params.append('per_page', perPage.toString());
 
   const endpoint = `${API_URL}?${params.toString()}`;
   try {
     const response = await fetch(endpoint);
     if (!response.ok) throw new Error(`Error ${response.status}`);
-    const data = await response.json();
+    const data: ApiResponse<Actriz[]> = await response.json();
+    
     if (!data.success) throw new Error(data.error || 'Error desconocido');
-    return data.data;
+    
+    const actrices = data.data;
+    const totalItems = data.count || actrices.length;
+    const totalPages = Math.ceil(totalItems / perPage);
+    
+    return {
+      data: actrices,
+      totalItems,
+      currentPage: page,
+      totalPages,
+      itemsPerPage: perPage
+    };
   } catch (error) {
     console.error('Error en filtros:', error);
-    return await getActrices(); // Fallback a todas las actrices si hay error
+    // Fallback con paginación vacía
+    return {
+      data: [],
+      totalItems: 0,
+      currentPage: page,
+      totalPages: 0,
+      itemsPerPage: perPage
+    };
   }
 };

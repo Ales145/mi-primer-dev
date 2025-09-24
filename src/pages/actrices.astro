@@ -1,22 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import SearchActrices from "../components/actrices/SearchActrices.astro";
-import FilterActrices from "../components/actrices/FilterActrices.astro";
-
-// La URL de la API
-const API_URL = 'https://ensalud.info/generator/api-actriz.php';
-
-interface Actriz {
-  id: string;
-  name: string;
-  slug: string;
-  image: string;
-  bio: string;
-  birthDate: string;
-  birthPlace: string;
-  height: string;
-  featured: boolean;
-}
+import { getActricesFiltered, type Actriz } from "../lib/wp";
 
 // Get URL parameters
 const url = Astro.url;
@@ -25,48 +9,20 @@ const orderBy = url.searchParams.get('orderBy') || '';
 const featured = url.searchParams.get('featured') === 'true';
 const pageParam = Number(url.searchParams.get('page')) || 1;
 
-// Get actresses based on search or filters
-let actrices: Actriz[] = [];
-
-try {
-  const params = new URLSearchParams();
-  
-  if (searchQuery) {
-    // Búsqueda
-    params.append('action', 'search');
-    params.append('q', searchQuery);
-  } else {
-    // Listado con filtros
-    params.append('action', 'all');
-  }
-
-  // Agregar parámetros de filtrado y paginación
-  if (orderBy) params.append('order', orderBy);
-  if (featured) params.append('featured', 'true');
-  params.append('page', pageParam.toString());
-  params.append('per_page', '12');
-
-  console.log('API URL:', `${API_URL}?${params.toString()}`); // Para debug
-
-  const response = await fetch(`${API_URL}?${params.toString()}`);
-  if (!response.ok) throw new Error(`Error ${response.status}`);
-  const data = await response.json();
-  
-  if (data.success) {
-    actrices = data.data;
-  } else {
-    throw new Error(data.error || 'Error desconocido');
-  }
-} catch (error) {
-  console.error('Error:', error);
-  actrices = [];
-}
-
-// Usamos los datos de paginación de la API
-const totalItems = actrices.length; // Deberíamos obtener esto de la API
-const itemsPerPage = 12;
-const totalPages = Math.ceil(totalItems / itemsPerPage);
-const paginatedActrices = actrices; // La API ya nos da los resultados paginados
+// Fetch data using SSR
+const {
+  data: actrices,
+  totalItems,
+  currentPage,
+  totalPages,
+  itemsPerPage
+} = await getActricesFiltered({
+  search: searchQuery,
+  orderBy,
+  featured,
+  page: pageParam,
+  perPage: 12
+});
 ---
 
 <Layout 
@@ -141,7 +97,7 @@ const paginatedActrices = actrices; // La API ya nos da los resultados paginados
 
             <!-- Grid de Actrices -->
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {paginatedActrices.map((actriz: Actriz) => (
+                {actrices.map((actriz: Actriz) => (
                     <article class="group">
                         <a href={`/actrices/${actriz.slug}`} class="block">
                             <div class="relative overflow-hidden rounded-lg aspect-[3/4]">
