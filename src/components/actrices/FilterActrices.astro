@@ -1,0 +1,134 @@
+---
+import type { FilterOptions } from '../../lib/wp';
+
+interface Props {
+  class?: string;
+  currentFilters?: FilterOptions;
+}
+
+const { class: className, currentFilters = {} } = Astro.props;
+
+const sortOptions = [
+  { value: 'name-asc', label: 'Nombre (A-Z)' },
+  { value: 'name-desc', label: 'Nombre (Z-A)' },
+  { value: 'birthDate-asc', label: 'Edad (Menor a Mayor)' },
+  { value: 'birthDate-desc', label: 'Edad (Mayor a Menor)' }
+];
+---
+
+<div class:list={['filters-container', className]}>
+  <div class="filter-group">
+    <label for="sort">Ordenar por:</label>
+    <select id="sort" class="filter-select">
+      <option value="">Seleccionar...</option>
+      {
+        sortOptions.map(({ value, label }) => {
+          const [sortBy, sortOrder] = value.split('-');
+          const isSelected = currentFilters.sortBy === sortBy && 
+                           currentFilters.sortOrder === sortOrder;
+          return (
+            <option value={value} selected={isSelected}>
+              {label}
+            </option>
+          );
+        })
+      }
+    </select>
+  </div>
+
+  <div class="filter-group">
+    <label class="checkbox-label">
+      <input
+        type="checkbox"
+        id="featured"
+        checked={currentFilters.featured}
+      />
+      Solo destacadas
+    </label>
+  </div>
+</div>
+
+<script>
+  function updateURL(filters: Record<string, string | boolean>) {
+    const url = new URL(window.location.href);
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value) {
+        url.searchParams.set(key, value.toString());
+      } else {
+        url.searchParams.delete(key);
+      }
+    });
+    window.location.href = url.toString();
+  }
+
+  // Sort handler
+  const sortSelect = document.getElementById('sort') as HTMLSelectElement;
+  sortSelect?.addEventListener('change', () => {
+    const [sortBy, sortOrder] = (sortSelect.value || '-').split('-');
+    updateURL({
+      sortBy,
+      sortOrder,
+      featured: (document.getElementById('featured') as HTMLInputElement)?.checked || false
+    });
+  });
+
+  // Featured filter handler
+  const featuredCheckbox = document.getElementById('featured') as HTMLInputElement;
+  featuredCheckbox?.addEventListener('change', () => {
+    updateURL({
+      sortBy: (sortSelect.value || '-').split('-')[0],
+      sortOrder: (sortSelect.value || '-').split('-')[1],
+      featured: featuredCheckbox.checked
+    });
+  });
+</script>
+
+<style>
+  .filters-container {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    padding: 16px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+
+  .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .filter-select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    min-width: 200px;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+
+  .checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
+
+  @media (max-width: 768px) {
+    .filters-container {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .filter-select {
+      width: 100%;
+    }
+  }
+</style>

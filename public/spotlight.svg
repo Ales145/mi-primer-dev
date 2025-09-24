@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800px" height="800px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="spotlightGradient">
+            <stop stop-color="#FFFFFF" stop-opacity="0.2" offset="0%"></stop>
+            <stop stop-color="#FFFFFF" stop-opacity="0.1" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <path d="M12,3 C16.9705627,3 21,7.02943725 21,12 C21,16.9705627 16.9705627,21 12,21 C7.02943725,21 3,16.9705627 3,12 C3,7.02943725 7.02943725,3 12,3 Z M12,5 C8.13400675,5 5,8.13400675 5,12 C5,15.8659932 8.13400675,19 12,19 C15.8659932,19 19,15.8659932 19,12 C19,8.13400675 15.8659932,5 12,5 Z" fill="url(#spotlightGradient)"></path>
+        <path d="M12,7 C14.209139,7 16,8.790861 16,11 C16,13.209139 14.209139,15 12,15 C9.790861,15 8,13.209139 8,11 C8,8.790861 9.790861,7 12,7 Z M12,9 C10.8954305,9 10,9.8954305 10,11 C10,12.1045695 10.8954305,13 12,13 C13.1045695,13 14,12.1045695 14,11 C14,9.8954305 13.1045695,9 12,9 Z" fill="#FFFFFF"></path>
+        <path d="M12,2 L12,4 M12,20 L12,22 M2,12 L4,12 M20,12 L22,12" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"></path>
+        <path d="M4.92893219,4.92893219 L6.34314575,6.34314575 M17.6568542,17.6568542 L19.0710678,19.0710678 M4.92893219,19.0710678 L6.34314575,17.6568542 M17.6568542,6.34314575 L19.0710678,4.92893219" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"></path>
+    </g>
+</svg>

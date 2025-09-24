@@ -58,3 +58,49 @@ export const getActrizBySlug = async (slug: string): Promise<Actriz> => {
   if (!data.success) throw new Error(data.error || `No se encontró la actriz con slug: ${slug}`);
   return data.data;
 };
+
+/** Buscar actrices */
+export const searchActrices = async (query: string): Promise<Actriz[]> => {
+  const endpoint = `${API_URL}?action=search&q=${encodeURIComponent(query)}`;
+  const response = await fetch(endpoint);
+  if (!response.ok) throw new Error(`Error ${response.status} al buscar actrices.`);
+  const data: ApiResponse<Actriz[]> = await response.json();
+  if (!data.success) throw new Error(data.error || 'Error desconocido al buscar actrices');
+  return data.data;
+};
+
+/** Obtener actrices con filtros */
+export interface FilterOptions {
+  sortBy?: 'name' | 'birthDate';
+  sortOrder?: 'asc' | 'desc';
+  featured?: boolean;
+}
+
+export const getActricesFiltered = async (filters: FilterOptions): Promise<Actriz[]> => {
+  // Get all actresses first
+  let actrices = await getActrices();
+  
+  // Apply featured filter
+  if (filters.featured) {
+    actrices = actrices.filter(actriz => actriz.featured);
+  }
+
+  // Apply sorting
+  if (filters.sortBy) {
+    actrices.sort((a, b) => {
+      const aValue = filters.sortBy === 'name' ? a.name : a.birthDate;
+      const bValue = filters.sortBy === 'name' ? b.name : b.birthDate;
+      
+      if (filters.sortBy === 'birthDate') {
+        const dateA = new Date(aValue).getTime();
+        const dateB = new Date(bValue).getTime();
+        return filters.sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+      } else {
+        const compareResult = aValue.localeCompare(bValue);
+        return filters.sortOrder === 'asc' ? compareResult : -compareResult;
+      }
+    });
+  }
+
+  return actrices;
+};

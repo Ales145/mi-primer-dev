@@ -18,63 +18,111 @@ const actriz = await getActrizBySlug(slug);
     description={actriz.bio.substring(0, 155) + '...'} 
     keywords={`${actriz.name}, actriz, cine, televisión`}
 >
-    <main class="max-w-4xl mx-auto px-4 py-12">
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-            <!-- Imagen Hero -->
-            <div class="relative h-96">
+    <main class="min-h-screen bg-white">
+        <!-- Hero Section -->
+        <div class="relative h-[400px] bg-gradient-to-br from-purple-900 to-purple-700">
+            <div class="absolute inset-0 overflow-hidden">
                 <img 
                     src={actriz.image} 
                     alt={actriz.name}
-                    class="w-full h-full object-cover"
+                    class="w-full h-full object-cover opacity-30"
                 />
-                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                <h1 class="absolute bottom-6 left-6 text-4xl font-bold text-white">
+                <div class="absolute inset-0 bg-gradient-to-t from-purple-900/90 to-transparent"></div>
+            </div>
+            <div class="relative max-w-[1200px] mx-auto px-4 h-full flex flex-col justify-end pb-12">
+                <h1 class="text-5xl font-bold text-white mb-4">
                     {actriz.name}
                 </h1>
+                <div class="flex flex-wrap gap-6 text-white/90">
+                    <span class="flex items-center text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        {actriz.birthDate}
+                    </span>
+                    <span class="flex items-center text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        </svg>
+                        {actriz.birthPlace}
+                    </span>
+                    <span class="flex items-center text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                        </svg>
+                        {actriz.height}
+                    </span>
+                </div>
             </div>
+        </div>
 
-            <!-- Contenido -->
-            <div class="p-8">
-                <!-- Información Personal -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                    <div>
-                        <h2 class="text-2xl font-semibold mb-4">Información Personal</h2>
-                        <ul class="space-y-3">
-                            <li>
-                                <span class="font-medium text-gray-600">Fecha de nacimiento:</span>
-                                <span class="ml-2">{actriz.birthDate}</span>
-                            </li>
-                            <li>
-                                <span class="font-medium text-gray-600">Lugar de nacimiento:</span>
-                                <span class="ml-2">{actriz.birthPlace}</span>
-                            </li>
-                            <li>
-                                <span class="font-medium text-gray-600">Altura:</span>
-                                <span class="ml-2">{actriz.height}</span>
-                            </li>
-                        </ul>
-                    </div>
-                    
-                    <!-- Botón de regreso -->
-                    <div class="flex items-start justify-end">
-                        <a 
-                            href="/actrices" 
-                            class="inline-flex items-center px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
-                            </svg>
-                            Volver a actrices
-                        </a>
-                    </div>
+        <!-- Content Section -->
+        <div class="max-w-[1200px] mx-auto px-4 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <!-- Main Content -->
+                <div class="md:col-span-2">
+                    <section>
+                        <h2 class="text-2xl font-semibold mb-6">Biografía</h2>
+                        <p class="text-gray-700 leading-relaxed">
+                            {actriz.bio}
+                        </p>
+                    </section>
+
+                    <section class="mt-12">
+                        <h2 class="text-2xl font-semibold mb-6 text-purple-600">Momentos Destacados</h2>
+                        <div class="border-l-2 border-purple-200 pl-6 space-y-6">
+                            <div class="relative">
+                                <div class="absolute -left-[31px] bg-purple-600 rounded-full w-4 h-4 border-4 border-white"></div>
+                                <div class="mb-1 text-sm text-gray-600">{actriz.birthDate}</div>
+                                <h3 class="font-medium">Nacimiento</h3>
+                                <p class="text-gray-600">Nació en {actriz.birthPlace}</p>
+                            </div>
+                        </div>
+                    </section>
                 </div>
 
-                <!-- Biografía -->
-                <div>
-                    <h2 class="text-2xl font-semibold mb-4">Biografía</h2>
-                    <p class="text-gray-700 leading-relaxed">
-                        {actriz.bio}
-                    </p>
+                <!-- Sidebar -->
+                <div class="md:col-span-1">
+                    <div class="bg-gray-50 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold mb-6 text-purple-600">Información Rápida</h3>
+                        <dl class="space-y-4">
+                            <div>
+                                <dt class="text-sm text-gray-600">Altura</dt>
+                                <dd class="font-medium">{actriz.height}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm text-gray-600">Origen</dt>
+                                <dd class="font-medium">{actriz.birthPlace.split(',')[0]}</dd>
+                            </div>
+                        </dl>
+
+                        <div class="mt-8">
+                            <a 
+                                href="/actrices" 
+                                class="inline-flex items-center text-purple-600 hover:text-purple-700"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                </svg>
+                                Volver a Actrices
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Related Actresses -->
+        <div class="bg-white py-12">
+            <div class="container-custom">
+                <h2 class="section-title">También te puede interesar</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Aquí podrían ir actrices relacionadas */}
+                    <div class="card group">
+                        <div class="p-4 text-center">
+                            <p class="text-gray-500">Más actrices próximamente...</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

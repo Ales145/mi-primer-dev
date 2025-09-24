@@ -1,0 +1,186 @@
+---
+interface FilterOption {
+    value: string;
+    label: string;
+}
+
+interface Props {
+    selectedFilters?: string[];
+    onFilterChange?: (filters: string[]) => void;
+}
+
+const orderOptions: FilterOption[] = [
+    { value: 'name_asc', label: 'Nombre (A-Z)' },
+    { value: 'name_desc', label: 'Nombre (Z-A)' },
+    { value: 'birthDate_asc', label: 'Edad (Mayor a Menor)' },
+    { value: 'birthDate_desc', label: 'Edad (Menor a Mayor)' },
+];
+
+const heightOptions: FilterOption[] = [
+    { value: '150-160', label: '1.50m - 1.60m' },
+    { value: '160-170', label: '1.60m - 1.70m' },
+    { value: '170-180', label: '1.70m - 1.80m' },
+    { value: '180-plus', label: 'Más de 1.80m' },
+];
+
+const { selectedFilters = [] } = Astro.props;
+---
+
+<div class="filters-panel">
+    <!-- Order Dropdown -->
+    <div class="relative" id="order-dropdown">
+        <button 
+            type="button"
+            class="inline-flex items-center px-4 py-2 text-sm text-gray-700 hover:text-purple-600 focus:outline-none"
+            id="order-button"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+            </svg>
+            Ordenar
+        </button>
+        <div class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-100 hidden z-50" id="order-options">
+            {orderOptions.map(option => (
+                <button
+                    class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600"
+                    data-value={option.value}
+                >
+                    {option.label}
+                </button>
+            ))}
+        </div>
+    </div>
+
+    <!-- Filter Dropdown -->
+    <div class="relative" id="filter-dropdown">
+        <button 
+            type="button"
+            class="inline-flex items-center px-4 py-2 text-sm text-gray-700 hover:text-purple-600 focus:outline-none"
+            id="filter-button"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+            </svg>
+            Filtros
+        </button>
+        <div class="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-lg border border-gray-100 hidden z-50" id="filter-options">
+            <div class="p-4">
+                <!-- Height Filter -->
+                <div class="mb-4">
+                    <h3 class="font-medium text-gray-900 mb-2">Altura</h3>
+                    <div class="space-y-2">
+                        {heightOptions.map(option => (
+                            <label class="flex items-center">
+                                <input 
+                                    type="checkbox" 
+                                    value={option.value}
+                                    class="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                                    checked={selectedFilters.includes(option.value)}
+                                />
+                                <span class="ml-2 text-sm text-gray-700">{option.label}</span>
+                            </label>
+                        ))}
+                    </div>
+                </div>
+
+                <!-- Featured Filter -->
+                <div>
+                    <label class="flex items-center">
+                        <input 
+                            type="checkbox" 
+                            value="featured"
+                            class="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                            checked={selectedFilters.includes('featured')}
+                        />
+                        <span class="ml-2 text-sm text-gray-700">Solo Destacadas</span>
+                    </label>
+                </div>
+
+                <!-- Apply Button -->
+                <button 
+                    class="mt-4 w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                    id="apply-filters"
+                >
+                    Aplicar Filtros
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentOrder = '';
+    let currentFilters: string[] = [];
+
+    // Order Dropdown
+    const orderButton = document.getElementById('order-button');
+    const orderOptions = document.getElementById('order-options');
+
+    orderButton?.addEventListener('click', () => {
+        orderOptions?.classList.toggle('hidden');
+    });
+
+    orderOptions?.addEventListener('click', (e) => {
+        const button = (e.target as HTMLElement).closest('button');
+        if (button) {
+            const value = button.dataset.value;
+            if (value) {
+                currentOrder = value;
+                updateURL();
+                orderOptions.classList.add('hidden');
+            }
+        }
+    });
+
+    // Filter Dropdown
+    const filterButton = document.getElementById('filter-button');
+    const filterOptions = document.getElementById('filter-options');
+    const applyFilters = document.getElementById('apply-filters');
+
+    filterButton?.addEventListener('click', () => {
+        filterOptions?.classList.toggle('hidden');
+    });
+
+    applyFilters?.addEventListener('click', () => {
+        const checkboxes = filterOptions?.querySelectorAll('input[type="checkbox"]');
+        currentFilters = [];
+        
+        checkboxes?.forEach(checkbox => {
+            if ((checkbox as HTMLInputElement).checked) {
+                currentFilters.push((checkbox as HTMLInputElement).value);
+            }
+        });
+
+        updateURL();
+        filterOptions?.classList.add('hidden');
+    });
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!orderButton?.contains(e.target as Node) && !orderOptions?.contains(e.target as Node)) {
+            orderOptions?.classList.add('hidden');
+        }
+        if (!filterButton?.contains(e.target as Node) && !filterOptions?.contains(e.target as Node)) {
+            filterOptions?.classList.add('hidden');
+        }
+    });
+
+    // URL handling
+    function updateURL() {
+        const params = new URLSearchParams(window.location.search);
+        
+        if (currentOrder) {
+            params.set('order', currentOrder);
+        } else {
+            params.delete('order');
+        }
+
+        if (currentFilters.length > 0) {
+            params.set('filters', currentFilters.join(','));
+        } else {
+            params.delete('filters');
+        }
+
+        window.location.search = params.toString();
+    }
+</script>

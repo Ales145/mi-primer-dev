@@ -1,31 +1,75 @@
 ---
+interface Actriz {
+    name: string;
+    slug: string;
+    image: string;
+    bio: string;
+    birthDate: string;
+    birthPlace: string;
+    height: string;
+}
+
 const { actrices } = Astro.props;
 ---
 
-<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 p-8">
-    {actrices.map(actriz => (
-        <article class="bg-white rounded-lg shadow-lg overflow-hidden">
-            <img 
-                src={actriz.image} 
-                alt={actriz.name}
-                class="w-full h-64 object-cover"
-            />
-            <div class="p-6">
-                <h2 class="text-2xl font-bold mb-2">{actriz.name}</h2>
-                <p class="text-gray-700 mb-4">{actriz.bio}</p>
-                <div class="text-sm text-gray-600">
-                    <p><strong>Fecha de nacimiento:</strong> {actriz.birthDate}</p>
-                    <p><strong>Lugar de nacimiento:</strong> {actriz.birthPlace}</p>
-                    <p><strong>Altura:</strong> {actriz.height}</p>
-                </div>
-                <a 
-                    href={`/actrices/${actriz.slug}`} 
-                    class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
-                >
-                    Ver más detalles
-                </a>
-            </div>
-        </article>
-    ))}
-</section>
+<div class="bg-gray-50 py-16">
+    <div class="container-custom">
+        <h1 class="section-title">Nuestras Actrices</h1>
+        
+        <!-- Filtros -->
+        <div class="flex flex-wrap gap-4 mb-8 justify-center">
+            <button class="btn-secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"/>
+                </svg>
+                Ordenar por Nombre
+            </button>
+            <button class="btn-secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                </svg>
+                Destacadas
+            </button>
+        </div>
+
+        <!-- Grid de Actrices -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {actrices.map((actriz: Actriz) => (
+                <article class="card group">
+                    <div class="relative overflow-hidden">
+                        <img 
+                            src={actriz.image} 
+                            alt={actriz.name}
+                            class="w-full h-[280px] object-cover group-hover:scale-110 transition-transform duration-300"
+                        />
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </div>
+                    <div class="p-4">
+                        <h2 class="font-semibold text-lg mb-2 line-clamp-1">{actriz.name}</h2>
+                        <p class="text-sm text-gray-600 line-clamp-2 mb-3">{actriz.bio}</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-gray-500">{actriz.birthPlace.split(',')[0]}</span>
+                            <a 
+                                href={`/actrices/${actriz.slug}`} 
+                                class="text-purple-600 text-sm font-medium hover:text-purple-700 transition-colors"
+                            >
+                                Ver más →
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            ))}
+        </div>
+
+        <!-- Paginación -->
+        <div class="mt-12 flex justify-center gap-2">
+            <button class="btn-secondary px-4 py-2" disabled>
+                ← Anterior
+            </button>
+            <button class="btn-secondary px-4 py-2">
+                Siguiente →
+            </button>
+        </div>
+    </div>
+</div>
 
